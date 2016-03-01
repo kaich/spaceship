@@ -256,9 +256,6 @@ module Spaceship
         headers.merge!({ 'Cookie' => @request_cookie })
       end 
 
-      puts "start #{url_or_path} ================================="
-      puts "---------------------headers -----------: #{headers}"
-
 
       # Before encoding the parameters, log them
       log_request(method, url_or_path, params)
@@ -269,7 +266,6 @@ module Spaceship
         params, headers = encode_params(params, headers,is_plist)
       end
 
-      puts "===================params-----------#{params}" 
       response = send_request(method, url_or_path, params, headers, &block)
 
       log_response(method, url_or_path, response)
@@ -313,8 +309,6 @@ module Spaceship
     end
 
     def parse_response(response, expected_key = nil)
-
-      puts "--------------------------------------------- content : #{response.body}"
 
       if response.body
         if response.body["responseId"]
