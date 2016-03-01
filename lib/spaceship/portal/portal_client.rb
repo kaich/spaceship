@@ -174,15 +174,7 @@ module Spaceship
           userLocale: [user_locale],
         })
 
-      #parse_response(req, 'device')
-      content = parse_response(req)
-      if req.body.include? "already exists on this team"
-        msg = content["validationMessages"][0]
-        puts  msg
-        content
-      else
-        content 
-      end 
+      parse_response(req, 'device')
     end
 
     #####################################################

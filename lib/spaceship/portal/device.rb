@@ -1,3 +1,5 @@
+require "colored"
+
 module Spaceship
   module Portal
     # Represents a device from the Apple Developer Portal
@@ -149,13 +151,14 @@ module Spaceship
 
           # Find the device by UDID, raise an exception if it already exists
           existing = self.find_by_udid(udid, mac: mac)
-          puts "device #{name}: #{udid} is exist in your account device list!" if existing
+          puts "device #{name}: #{udid} is exist in your account device list!".yellow if existing
           return existing if existing
 
           # It is valid to have the same name for multiple devices
-
-          puts "#begin add device for #{name}: #{udid} ..."
-          device = client.create_device!(name, udid, mac: mac)
+          puts "begin add device for #{name}: #{udid} ...".yellow
+          device = client.with_retry do 
+             client.create_device!(name, udid, mac: mac)
+          end 
 
           # Update self with the new device
           self.new(device)
