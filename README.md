@@ -91,7 +91,7 @@ How fast are tools using `spaceship` compared to web scraping?
 ![assets/SpaceshipRecording.gif](assets/SpaceshipRecording.gif)
 
 # Installation
-
+	gem install specific_install
     sudo gem specific_install https://github.com/kaich/spaceship.git
 
 # Usage
