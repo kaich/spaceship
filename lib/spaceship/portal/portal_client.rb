@@ -225,13 +225,13 @@ module Spaceship
         app = content["appId"]
         if app
           appIdId = app["appIdId"]
-          download_provisioning_profile(appIdId)
+          download_not_exist_provisioning_profile(appIdId)
         end
       end
     end
 
 
-    def download_provisioning_profile(profile_id, mac: false)
+    def download_not_exist_provisioning_profile(profile_id, mac: false)
       r = request(:post, "https://developerservices2.apple.com/services/QH65B2/#{platform_slug(mac)}/downloadTeamProvisioningProfile.action?clientId=#{client_id}", {
         clientId: client_id,
         protocolVersion: PROTOCOL_VERSION,
@@ -247,6 +247,25 @@ module Spaceship
         raise UnexpectedResponse.new, "Couldn't download provisioning profile, got this instead: #{a}"
       end
     end
+
+    def download_provisioning_profile(profile_id, mac: false)
+      r = request(:post, "https://developerservices2.apple.com/services/QH65B2/#{platform_slug(mac)}/downloadProvisioningProfile.action?clientId=#{client_id}", {
+        clientId: client_id,
+        protocolVersion: PROTOCOL_VERSION,
+        teamId: team_id,
+        provisioningProfileId: profile_id,
+        requestId: @requestId,
+        userLocale: [user_locale],
+      })
+      a = parse_response(r,'provisioningProfile')
+      if r.success? && a
+        return a['encodedProfile'].read
+      else
+        raise UnexpectedResponse.new, "Couldn't download provisioning profile, got this instead: #{a}"
+      end
+    end
+
+
 
 
 
