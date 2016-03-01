@@ -134,9 +134,23 @@ module Spaceship
     # @!group Devices
     #####################################################
 
+    def apps(mac: false)
+      paging do |page_number|
+        r = request(:post, "https://developerservices2.apple.com/services/QH65B2/#{platform_slug(mac)}/listAppIds.action?clientId=#{client_id}", {
+        client: client_id,
+        teamId: team_id,
+        protocolVersion: PROTOCOL_VERSION,
+        requestId: @requestId,
+        userLocale: [user_locale],
+
+      })
+        parse_response(r, 'appIds')
+      end
+    end
+
     def devices(mac: false)
       paging do |page_number|
-        r = request(:post, "https://developerservices2.apple.com/services/QH65B2/mac/listDevices.action?clientId=#{client_id}", {
+        r = request(:post, "https://developerservices2.apple.com/services/QH65B2/#{platform_slug(mac)}/listDevices.action?clientId=#{client_id}", {
         client: client_id,
         teamId: team_id,
         protocolVersion: PROTOCOL_VERSION,

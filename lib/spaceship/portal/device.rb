@@ -142,16 +142,19 @@ module Spaceship
         # @return (Device): The newly created device
         def create!(name: nil, udid: nil, mac: false)
           # Check whether the user has passed in a UDID and a name
+
           unless udid && name
             raise "You cannot create a device without a device_id (UDID) and name"
           end
 
           # Find the device by UDID, raise an exception if it already exists
           existing = self.find_by_udid(udid, mac: mac)
+          puts "device #{name}: #{udid} is exist in your account device list!" if existing
           return existing if existing
 
           # It is valid to have the same name for multiple devices
 
+          puts "#begin add device for #{name}: #{udid} ..."
           device = client.create_device!(name, udid, mac: mac)
 
           # Update self with the new device

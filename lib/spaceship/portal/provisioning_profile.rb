@@ -204,9 +204,20 @@ module Spaceship
 
 
           profile = client.with_retry do
-            client.create_provisioning_profile!(name,
+            is_app_exist = false
+            client.apps.each do |app|
+              if app["identifier"] == bundle_id
+                is_app_exist = true
+                break 
+              end
+
+            end 
+
+            if !is_app_exist 
+              client.create_provisioning_profile!(name,
                                                 bundle_id,
                                                 mac: mac)
+            end 
             find_by_bundle_id(bundle_id)
           end
 
@@ -238,7 +249,6 @@ module Spaceship
         #   This may also contain invalid or expired profiles
         def find_by_bundle_id(bundle_id, mac: false)
          profiles = all(mac: mac).find_all do |profile|
-           puts "-------------app #{profile.app}"
 
             profile.app["identifier"] == bundle_id
           end
@@ -247,8 +257,6 @@ module Spaceship
            return profiles[0]
          end
 
-
-         puts "-------------app #{profiles}"
         
          return nil
         end
