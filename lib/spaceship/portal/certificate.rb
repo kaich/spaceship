@@ -313,7 +313,11 @@ module Spaceship
 
       # @return (String) Download the raw data of the certificate without parsing
       def download_raw
-        return self.certContent.read
+        if self.certContent 
+          return self.certContent.read
+        else 
+          client.download_certificate(id, type_display_id, mac: mac?)
+        end
       end
 
       # @return (OpenSSL::X509::Certificate) Downloads and parses the certificate

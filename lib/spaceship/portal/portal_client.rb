@@ -195,10 +195,10 @@ module Spaceship
     end
 
 
-    def create_certificate!(type, csr, app_id = nil)
+    def create_certificate!(type, csr, app_id = nil,mac: false)
       ensure_csrf
 
-      r = request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
+      r = request(:post, "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/submitDevelopmentCSR.action?clientId=#{client_id}", {
         client: client_id,
         teamId: team_id,
         protocolVersion: PROTOCOL_VERSION,
@@ -207,12 +207,33 @@ module Spaceship
         csrContent: csr,
 
       })
+      puts r.body
       parse_response(r, 'certRequest')
+    end
+
+
+    def download_certificate(certificate_id, type, mac: false)
+
+      { type: type, certificate_id: certificate_id }.each { |k, v| raise "#{k} must not be nil" if v.nil? }
+
+      r = request(:get, "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/downloadDevelopmentCert.action?clientId=#{client_id}", {
+        client: client_id,
+        teamId: team_id,
+        protocolVersion: PROTOCOL_VERSION,
+        requestId: @requestId,
+        userLocale: [user_locale],
+      })
+      a = parse_response(r)
+      if r.success? && a.include?("Apple Inc")
+        return a
+      else
+        raise UnexpectedResponse.new, "Couldn't download certificate, got this instead: #{a}"
+      end
     end
     
 
     def revoke_certificate!(certificate_id, type, mac: false)
-      r = request(:post, "account/#{platform_slug(mac)}/certificate/revokeCertificate.action", {
+      r = request(:post, "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/revokeDevelopmentCert.action?clientId=#{client_id}", {
         client: client_id,
         teamId: team_id,
         protocolVersion: PROTOCOL_VERSION,
@@ -220,7 +241,7 @@ module Spaceship
         userLocale: [user_locale],
         serialNumber: certificate_id,
       })
-      parse_response(r, 'certRequests')
+      parse_response(r, 'certRequest')
     end
 
     #####################################################
