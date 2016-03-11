@@ -321,6 +321,11 @@ module Spaceship
         OpenSSL::X509::Certificate.new(download_raw)
       end
 
+      # Revoke the certificate. You shouldn't use this method probably.
+      def revoke!
+        client.revoke_certificate!(id, type_display_id, mac: mac?)
+      end
+
 
       # @return (Bool): Is this certificate a push profile for apps?
       # rubocop:disable Style/PredicateName

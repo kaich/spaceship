@@ -67,7 +67,7 @@ module Spaceship
     # @return (Array) A list of all available teams
     def teams
 
-      req = request(:post, "https://developerservices2.apple.com/services/QH65B2/listTeams.action?clientId=#{client_id}",{
+      req = request(:post, "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/listTeams.action?clientId=#{client_id}",{
         client: client_id,
         myacinfo: @myacinfo,
         protocolVersion: PROTOCOL_VERSION,
@@ -136,7 +136,7 @@ module Spaceship
 
     def apps(mac: false)
       paging do |page_number|
-        r = request(:post, "https://developerservices2.apple.com/services/QH65B2/#{platform_slug(mac)}/listAppIds.action?clientId=#{client_id}", {
+        r = request(:post, "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listAppIds.action?clientId=#{client_id}", {
         client: client_id,
         teamId: team_id,
         protocolVersion: PROTOCOL_VERSION,
@@ -150,7 +150,7 @@ module Spaceship
 
     def devices(mac: false)
       paging do |page_number|
-        r = request(:post, "https://developerservices2.apple.com/services/QH65B2/#{platform_slug(mac)}/listDevices.action?clientId=#{client_id}", {
+        r = request(:post, "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listDevices.action?clientId=#{client_id}", {
         client: client_id,
         teamId: team_id,
         protocolVersion: PROTOCOL_VERSION,
@@ -183,7 +183,7 @@ module Spaceship
 
     def certificates(types = "dev", mac: false)
       paging do |page_number|
-        r = request(:post, "https://developerservices2.apple.com/services/QH65B2/#{platform_slug(mac)}/listAllDevelopmentCerts.action?clientId=#{client_id}", {
+        r = request(:post, "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/listAllDevelopmentCerts.action?clientId=#{client_id}", {
           clientId: client_id,
           teamId: team_id,
           requestId: @requestId,
@@ -195,6 +195,33 @@ module Spaceship
     end
 
 
+    def create_certificate!(type, csr, app_id = nil)
+      ensure_csrf
+
+      r = request(:post, 'account/ios/certificate/submitCertificateRequest.action', {
+        client: client_id,
+        teamId: team_id,
+        protocolVersion: PROTOCOL_VERSION,
+        requestId: @requestId,
+        userLocale: [user_locale],
+        csrContent: csr,
+
+      })
+      parse_response(r, 'certRequest')
+    end
+    
+
+    def revoke_certificate!(certificate_id, type, mac: false)
+      r = request(:post, "account/#{platform_slug(mac)}/certificate/revokeCertificate.action", {
+        client: client_id,
+        teamId: team_id,
+        protocolVersion: PROTOCOL_VERSION,
+        requestId: @requestId,
+        userLocale: [user_locale],
+        serialNumber: certificate_id,
+      })
+      parse_response(r, 'certRequests')
+    end
 
     #####################################################
     # @!group Provisioning Profiles
@@ -238,7 +265,7 @@ module Spaceship
 
 
     def download_not_exist_provisioning_profile(profile_id, mac: false)
-      r = request(:post, "https://developerservices2.apple.com/services/QH65B2/#{platform_slug(mac)}/downloadTeamProvisioningProfile.action?clientId=#{client_id}", {
+      r = request(:post, "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/downloadTeamProvisioningProfile.action?clientId=#{client_id}", {
         clientId: client_id,
         protocolVersion: PROTOCOL_VERSION,
         teamId: team_id,
@@ -255,7 +282,7 @@ module Spaceship
     end
 
     def download_provisioning_profile(profile_id, mac: false)
-      r = request(:post, "https://developerservices2.apple.com/services/QH65B2/#{platform_slug(mac)}/downloadProvisioningProfile.action?clientId=#{client_id}", {
+      r = request(:post, "https://developerservices2.apple.com/services/#{PROTOCOL_VERSION}/#{platform_slug(mac)}/downloadProvisioningProfile.action?clientId=#{client_id}", {
         clientId: client_id,
         protocolVersion: PROTOCOL_VERSION,
         teamId: team_id,
