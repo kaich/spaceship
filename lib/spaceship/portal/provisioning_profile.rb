@@ -168,6 +168,8 @@ module Spaceship
           attrs['devices'].map! { |device| Device.set_client(@client).factory(device) }
           attrs['certificates'].map! { |cert| Certificate.set_client(@client).factory(cert) }
 
+          puts "----------------------#{attrs}"
+
           klass.client = @client
           klass.new(attrs)
         end
@@ -372,7 +374,7 @@ module Spaceship
 
       # @return (Bool) Is the current provisioning profile valid?
       def valid?
-        return (status == 'Active' and certificate_valid?)
+        return (status == 'Active')
       end
 
       # @return (Bool) Is this profile managed by Xcode?
