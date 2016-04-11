@@ -168,7 +168,6 @@ module Spaceship
           attrs['devices'].map! { |device| Device.set_client(@client).factory(device) }
           attrs['certificates'].map! { |cert| Certificate.set_client(@client).factory(cert) }
 
-          puts "----------------------#{attrs}"
 
           klass.client = @client
           klass.new(attrs)
